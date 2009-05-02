@@ -19,9 +19,15 @@ class FakeCgi < CGI
 end
 
 def request_with_ua(user_agent, env={})
+  # XXX: Hack.  The parameters method in ActionPack is returning
+  #      nil because it is trying to do a merge on
+  #      request_parameters which aliases to POST which is
+  #      nil.   It SHOULD return an empty hash.  To get around this
+  #      we fake this by setting the following to an empty hash
+  env = env.merge({ "action_controller.request.request_parameters" => {} })
   fake_cgi = FakeCgi.new(user_agent, env)
   [ 
-    ActionController::CgiRequest.new(fake_cgi), 
+    ActionController::CgiRequest.new(fake_cgi.env_table), 
     Rack::Request.new(
       Rack::MockRequest.env_for('http://www.example.jp', fake_cgi.env_table)
     ).extend(Jpmobile::RequestWithMobile) 
@@ -30,7 +36,7 @@ end
 
 ## add helper methods to rails testing framework
 module ActionController
-  class TestRequest < AbstractRequest
+  class TestRequest < Request
     attr_accessor :user_agent
   end
 end
