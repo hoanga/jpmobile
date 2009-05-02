@@ -7,7 +7,7 @@ RAILS_ENV = "test"
 require File.dirname(__FILE__)+'/../../lib/jpmobile'
 
 # ActionPackのTestのためのrequire
-action_pack_full_path = Gem.cache.search('actionpack').sort_by { |g| g.version.version }.last
+action_pack_full_path = Gem.cache.find_name('actionpack').sort_by { |g| g.version.version }.last
 require File.join(action_pack_full_path.full_gem_path,'test/abstract_unit')
 
 class FakeCgi < CGI
